@@ -1,0 +1,9 @@
+*.pem
+*.key
+id_*
+.env
+*.tar
+wazuh-install-files.tar
+wazuh-passwords.txt
+*.secret
+.DS_Store
