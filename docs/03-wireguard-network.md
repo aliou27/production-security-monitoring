@@ -115,6 +115,61 @@ Reading the login banner like an analyst:
 | The hub is a single point of failure | Agents buffer events while disconnected | Acceptable for a lab; document recovery steps |
 | No key rotation yet | Keys are new | Define a rotation procedure |
 
-## 9. Next step
+## 9. First agent: Zikrou staging
 
-Install the Wazuh agent on staging, enroll it with the manager at `10.10.0.1` through the tunnel, and confirm it appears as `active` in the dashboard.
+### Enrollment with a password
+
+By default, the Wazuh manager enrolls any agent that reaches TCP 1515. The tunnel already limits who can reach that port, but an **enrollment password** was added as a second lock: a random 48-character secret in `/var/ossec/etc/authd.pass` (owner `root:wazuh`, mode `640`), with `<use_password>yes</use_password>` in the manager configuration.
+
+The agent was installed from Wazuh's signed APT repository, pointed at the manager's **tunnel address** (`10.10.0.1`), and the package was put on hold (`apt-mark hold wazuh-agent`) so a routine upgrade can never make the agent newer than the manager.
+
+The agent first appeared as `Pending` (enrolled, waiting for its first keepalive), then `Active` within a minute:
+
+![Agent active on the manager](images/03/hub-agent-active.png)
+
+The dashboard confirms the agent reports from its **tunnel IP, 10.10.0.4**: its traffic goes through WireGuard, not the internet.
+
+![Agent details in the dashboard](images/03/agent-staging-details.png)
+
+### Measured overhead on a 1 GB server
+
+Staging is the smallest server in the lab (909 MiB of RAM). systemd reported **338 MB** for the agent, which looked alarming. Measuring the real resident memory of each process told a different story:
+
+![Agent memory measurement](images/03/agent-staging-memory.png)
+
+| Process | Role | RSS |
+|---|---|---|
+| wazuh-modulesd | SCA, inventory, package scan | 24 MB |
+| wazuh-syscheckd | File integrity monitoring | 15 MB |
+| wazuh-logcollector | Log reading | 13 MB |
+| wazuh-agentd | Encrypted link to the manager | 9 MB |
+| wazuh-execd | Active response | 3 MB |
+| **Total** | | **64 MB** |
+
+The systemd figure includes about 270 MB of **page cache** from the agent's initial scans, which the kernel frees on demand. CPU usage flattened once the scans finished. **Conclusion:** about 7% of RAM on the most constrained server, no tuning needed. **Lesson:** a metric is only useful once you know exactly what it measures.
+
+### First data
+
+Within minutes, the agent produced its first events: the CIS benchmark results.
+
+![First events from staging](images/03/agent-staging-first-events.png)
+
+Rule IDs observed: **19003** (SCA summary, level 5), **19007** (check failed, level 7), **19008** (check passed, level 3).
+
+**CIS score: 51%** (121 passed, 116 failed, 42 not applicable). This is the baseline to improve.
+
+![SCA score for staging](images/03/agent-staging-sca-score.png)
+
+**Vulnerability detection** reported 103 critical, 890 high and 769 medium findings, plus 1,238 pending evaluation.
+
+![Vulnerabilities on staging](images/03/agent-staging-vulnerabilities.png)
+
+These numbers must not be taken at face value. **All 3,138 findings come from a single package, `linux-aws`** (the kernel), and the top CVEs date from 2012 to 2017, while the server runs a 2026 kernel freshly patched the same day. Matching kernel packages against CVE databases is a well-known source of false positives in vulnerability scanners. Triage plan: list the installed kernel packages, remove obsolete ones, and check a sample of the critical CVEs against the Ubuntu security tracker before drawing conclusions.
+
+**IT hygiene** shows memory use at 49%, Debian packages plus a few Python and snap packages, and Docker running (`containerd-shim-runc-v2`). Outbound traffic goes to 443, 80 and **1514**, the Wazuh agent port, through the tunnel.
+
+![IT hygiene for staging](images/03/agent-staging-it-hygiene.png)
+
+## 10. Next step
+
+Collect the application logs on staging (Caddy and the Spring Boot API running in Docker), which the agent cannot see yet.
