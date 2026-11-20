@@ -1,0 +1,12 @@
+<ossec_config>
+  <localfile>
+    <log_format>json</log_format>
+    <location>/var/log/caddy/api-staging.access.log</location>
+    <label key="log_source">caddy-api-staging</label>
+  </localfile>
+  <localfile>
+    <log_format>json</log_format>
+    <location>/var/log/caddy/admin-staging.access.log</location>
+    <label key="log_source">caddy-admin-staging</label>
+  </localfile>
+</ossec_config>

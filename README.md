@@ -54,7 +54,8 @@ Design principles:
 | 1 | Cloud setup and server hardening | Done | [docs/01-cloud-setup-and-hardening.md](docs/01-cloud-setup-and-hardening.md) |
 | 2 | Wazuh installation | Done, write-up in progress | |
 | 3 | WireGuard network and agent enrollment | In progress: hub up, first agent (staging) active | [docs/03-wireguard-network.md](docs/03-wireguard-network.md) |
-| 4 | Windows lab with Sysmon | Planned | |
+| 4 | Web logs and custom detections (Caddy) | Done on staging | [docs/04-web-logs-and-custom-detections.md](docs/04-web-logs-and-custom-detections.md) |
+| 4b | Windows lab with Sysmon | Planned | |
 | 5 | Baseline: one week of normal traffic | Planned | |
 | 6 | First detection: SSH brute force (T1110) | Planned | |
 | 7 | Attack and detect cycles, incident reports | Planned | |

@@ -1,0 +1,24 @@
+api-staging.zikrou.com {
+	reverse_proxy localhost:8080
+
+	log {
+		output file /var/log/caddy/api-staging.access.log {
+			roll_size 10MiB
+			roll_keep 5
+		}
+		format json
+	}
+}
+
+admin-staging.zikrou.com {
+	root * /var/www/admin-staging
+	file_server
+
+	log {
+		output file /var/log/caddy/admin-staging.access.log {
+			roll_size 10MiB
+			roll_keep 5
+		}
+		format json
+	}
+}
