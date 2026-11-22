@@ -57,11 +57,12 @@ Design principles:
 | 4 | Web logs and custom detections (Caddy) | Done on staging | [docs/04-web-logs-and-custom-detections.md](docs/04-web-logs-and-custom-detections.md) |
 | 5 | API security logs and auth detections, critical vulnerability found and fixed | Done on staging | [docs/05-api-security-logs-and-reset-code-vulnerability.md](docs/05-api-security-logs-and-reset-code-vulnerability.md) |
 | 6 | Production onboarding and first triage | Done | [docs/06-production-onboarding.md](docs/06-production-onboarding.md) |
-| 7 | Windows lab with Sysmon | Planned | |
-| 8 | Baseline: one week of normal traffic | Planned | |
-| 9 | SSH brute force detection and tuning (T1110) | Planned | |
-| 10 | Attack and detect cycles, incident reports | Planned | |
-| 11 | Alert enrichment and triage automation | Planned | |
+| 7 | Incident response process and first incident reports | Done | [docs/07-incident-response.md](docs/07-incident-response.md) |
+| 8 | SSH detection engineering and automated response | Planned | |
+| 9 | Windows lab with Sysmon and Atomic Red Team | Planned | |
+| 10 | Baseline: one week of normal traffic | Planned | |
+| 11 | Purple team scorecard | Planned | |
+| 12 | Alert enrichment and notifications | Planned | |
 
 ## Repository layout
 
@@ -69,8 +70,9 @@ Design principles:
 docs/          one write-up per phase
 docs/images/   screenshots, one folder per phase
 configs/       configuration files applied to the servers (no secrets)
+incidents/     incident report template and closed incident reports
 ```
 
 ## Security note
 
-This repository contains no secrets, keys, passwords or public IP addresses. Placeholders such as `<WAZUH_PUBLIC_IP>` are used instead.
+This repository contains no secrets, keys, passwords, personal data or IP addresses of my own infrastructure and connections. Placeholders such as `<WAZUH_PUBLIC_IP>` are used instead. IP addresses of internet scanners appear in incident reports as indicators.
