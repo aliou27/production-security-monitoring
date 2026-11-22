@@ -71,7 +71,7 @@ The successful logins:
 | Source | Key | Verdict |
 |---|---|---|
 | My connection (2 IPs, 2 days) | My key | Legitimate |
-| A Microsoft Azure IP in the US | A different key | **Checked:** the fingerprint matches the CI/CD deploy key, and a GitHub Actions deploy ran at that exact minute. GitHub Actions runners are hosted on Azure. Legitimate. |
+| A Microsoft Azure IP in the US | A different key | **Checked:** the fingerprint matches the CI/CD deploy key, and GitHub Actions runners are hosted on Azure. The production team's remediation report confirms it independently: the deploy of the F1 fix restarted the API at 18:55:30 UTC, 1.5 minutes after this login at 18:53:57. Legitimate. |
 
 **Verdict:** true positive (real attempts), no impact. Closed as internet background noise.
 
@@ -93,16 +93,65 @@ Configuration: [`configs/wazuh/agent/prod-localfile-caddy.xml`](../configs/wazuh
 
 ![Agent reading the three Caddy logs](images/06/prod-caddy-logcollector.png)
 
-**Volume.** Production writes about 200 MB of API access logs per day. The agent reads only new lines from the moment it starts, so the existing logs are not replayed. Only lines matching a rule become alerts. Rule 100201 (every 4xx response, level 3) may become noisy with real users, because expired sessions produce ordinary 401s. It will be measured over a few days and tuned if needed.
+**Volume.** Production writes about 200 MB of API access logs per day. The agent reads only new lines from the moment it starts, so the existing logs are not replayed. Only lines matching a rule become alerts.
 
 **Validation without attacking production.** No test attack is sent to production. Internet bots probe `/.env`, `/.git/config` and admin paths on every public site; their requests are expected to trigger rule 100210 on their own.
 
-## 6. Rootcheck events
+## 6. First tuning: a false positive that revealed a bug
+
+### Symptom
+
+Minutes after the web logs arrived, rule **100201** (any 4xx response, level 3) fired about **100 times per minute**, around 150,000 alerts per day. Almost every alert had the same shape:
+
+- Route: `PATCH /api/v1/zikr/{id}/progress`, which the app sends about every 70 seconds while someone listens.
+- Many different source IPs, mostly Senegalese mobile and broadband networks: real users, not attackers.
+
+An analyst cannot read 100 alerts per minute. But silencing an alert without understanding it can hide a real problem, so the cause came first.
+
+### Investigation
+
+| Question | Method | Result |
+|---|---|---|
+| Which status codes does this route return? | Count `status` on `/progress` in the last 20,000 Caddy lines | 2,569 &times; 200, **12,491 &times; 403**, 53 &times; 401 |
+| What does the API require for this route? | Read `SecurityConfig` | No specific rule, so `anyRequest().authenticated()`: an account is required. `/play` and `/view` are open to guests. Without a token, Spring Security answers **403** by default (no custom `AuthenticationEntryPoint`). |
+| Are the 403s guests? | Count the `Authorization` header (Caddy logs its presence, value redacted) | **0** of the 403s carry one. The 200s do. |
+
+**Conclusion.** Listeners without an account may play audio, but the Flutter app still sends their progress, and the API correctly refuses it.
+
+| Question | Answer |
+|---|---|
+| Attack? | No |
+| Access control? | Works as intended: a guest cannot write progress |
+| Data loss for users? | No: logged-in users' progress returns 200 |
+| Bug? | Yes, functional: about 83% of progress requests are bound to fail, which wastes mobile data, battery and API capacity. The API also answers 403 where 401 is the correct code. |
+
+Reported to the production team (finding F9) with two fixes: send progress only when logged in (app), and return 401 for unauthenticated requests (API).
+
+### Tuning
+
+The rule was not lowered for every 4xx. A **narrow exception** was added instead: a child rule at level 0 that only matches the three conditions together.
+
+```xml
+<rule id="100202" level="0">
+  <if_sid>100201</if_sid>
+  <field name="request.method">^PATCH$</field>
+  <field name="request.uri" type="pcre2">^/api/v1/zikr/\d+/progress(\?|$)</field>
+  <status type="pcre2">^403$</status>
+  <description>Caddy: progress update from anonymous listener rejected (expected behaviour)</description>
+</rule>
+```
+
+- A 401, 404 or 500 on the same route still raises an alert.
+- These requests no longer count toward rule 100220 (20 errors in 60 seconds from one IP). This matters in Senegal, where many mobile users share one public IP through their carrier: a group of guest listeners would otherwise look like a scan.
+
+**Lesson:** the noisiest alert of the day was not an attack, it was a product bug. Understanding a false positive before tuning it is what turned noise into a finding.
+
+## 7. Rootcheck events
 
 When the agent started, the rootkit scan (rootcheck) produced 15 alerts with rule 510. They will be triaged separately: on servers running Docker, these are often false positives caused by container files.
 
-## 7. Next steps
+## 8. Next steps
 
-- Measure the volume of web alerts from production after a few days, then tune rule 100201.
+- Review the remaining 4xx alerts from production after a few days (401, 404) and tune where justified.
 - Triage the rootcheck alerts.
 - Deploy the application security audit logs to production (see [report 05](05-api-security-logs-and-reset-code-vulnerability.md)), after the production team ships the log cleanup.
