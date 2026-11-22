@@ -1,0 +1,10 @@
+<group name="rootcheck,local,">
+
+  <rule id="100400" level="0">
+    <if_sid>510</if_sid>
+    <field name="title">^Trojaned version of file detected.$</field>
+    <field name="file" type="pcre2">^/(usr/)?bin/(cat|chgrp|chmod|chown|date|echo|env|ls|md5sum|uname)$</field>
+    <description>Rootcheck: trojan pattern on a rust-coreutils binary, verified with dpkg (known false positive on Ubuntu 25.10 and later)</description>
+  </rule>
+
+</group>

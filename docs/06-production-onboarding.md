@@ -163,12 +163,46 @@ All of it is normal user behaviour. Adding one exception per route would never e
 
 This is how mature detection is designed: atomic events are kept for context and correlation, and alerts are raised on behaviour.
 
-## 7. Rootcheck events
+## 7. Rootcheck: "trojaned" system commands
 
-When the agent started, the rootkit scan (rootcheck) produced 15 alerts with rule 510. They will be triaged separately: on servers running Docker, these are often false positives caused by container files.
+### Alert
+
+When the agent started, rootcheck raised **59 alerts** (rule 510): *Trojaned version of file detected*, on `ls`, `cat`, `chmod`, `chown`, `chgrp`, `date`, `echo`, `env`, `md5sum` and `uname`. A replaced system command is a classic rootkit technique (T1014): the attacker swaps `ls` or `ps` for a version that hides their files and processes. This alert cannot be closed on a guess.
+
+### Hypothesis
+
+Rootcheck does not compare hashes. It searches binaries for suspicious text patterns, a heuristic designed when these commands were small C programs. Production runs **Ubuntu 26.04**, where the GNU commands were replaced by **rust-coreutils**: one large Rust binary that implements every command and naturally contains the patterns rootcheck looks for.
+
+Two clues supported it: the whole family of commands was flagged at once (an attacker replaces a few targeted ones), and each file appeared twice, as `/bin/x` and `/usr/bin/x`, because `/bin` is only a link to `/usr/bin`.
+
+### Verification (read-only)
+
+The decisive test compares the files on disk with the checksums the package manager recorded at installation.
+
+| Check | Result |
+|---|---|
+| OS | Ubuntu 26.04 LTS |
+| `/bin` | Symbolic link to `usr/bin` (explains the duplicates) |
+| `/usr/bin/ls` resolves to | `/usr/lib/cargo/bin/coreutils/ls` |
+| Owning package | `rust-coreutils` |
+| `dpkg --verify rust-coreutils` | No output, exit code 0: **every file matches the package checksums** |
+
+**Verdict: false positive.** The binaries are exactly the ones Ubuntu shipped. No sign of compromise.
+
+### Tuning
+
+A narrow exception was added on the manager: rule 100400, level 0, child of 510, matching only this title **and** only these 10 commands in `/bin` or `/usr/bin`. A trojan alert on any other file still fires.
+
+Suppressing an alert on `ls` is a real trade-off, because a real rootkit would replace exactly these files. Two controls compensate:
+
+- **File integrity monitoring** (syscheck) watches `/bin` and `/usr/bin` by default and alerts on any change to these binaries, based on hashes, not patterns.
+- **`dpkg --verify`** remains the reference check, and can be rerun at any time.
+
+The exception should be reviewed when Wazuh updates its trojan signatures for rust-coreutils.
+
+**Lesson:** a detection heuristic is tied to the era it was written for. When the system underneath changes (C to Rust), it can turn into a stream of false positives. The analyst's job is to prove it with a stronger check before silencing it.
 
 ## 8. Next steps
 
 - Review the remaining 4xx alerts from production after a few days (401, 404) and tune where justified.
-- Triage the rootcheck alerts.
 - Deploy the application security audit logs to production (see [report 05](05-api-security-logs-and-reset-code-vulnerability.md)), after the production team ships the log cleanup.

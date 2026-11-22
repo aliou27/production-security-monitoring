@@ -30,7 +30,7 @@
     <group>web_scan,</group>
   </rule>
 
-  <rule id="100201" level="3">
+  <rule id="100201" level="0">
     <if_sid>100200</if_sid>
     <status type="pcre2">^4\d\d$</status>
     <description>Caddy: client error on $(request.uri) from $(request.remote_ip)</description>
