@@ -146,6 +146,23 @@ The rule was not lowered for every 4xx. A **narrow exception** was added instead
 
 **Lesson:** the noisiest alert of the day was not an attack, it was a product bug. Understanding a false positive before tuning it is what turned noise into a finding.
 
+### Second tuning: alert on behaviour, not on single errors
+
+After the first tuning, the volume dropped from about 100 alerts per minute to a few. The remaining 4xx showed a second pattern: one IP producing about 8 errors **in the same second**, on the routes the app calls when it opens (`/home`, `/album`, `/config`, `/users/me`, `/me/notifications`).
+
+| Status | Routes | Cause |
+|---|---|---|
+| 401 | Personal **and public** routes (`/album`, `/home`, `/config`, `/zakir`, `/daira`) | The phone sends an **expired token** when the app opens. The JWT filter rejects it before checking whether the route is public. The app then refreshes the session and retries. |
+| 403 | `/playlists`, `/me/notifications`, `/search/history` | Guests: the app calls personal routes without an account, the same pattern as the progress requests. Added to finding F9. |
+
+All of it is normal user behaviour. Adding one exception per route would never end, so the design itself was changed:
+
+- **Rule 100201 now has level 0.** A single 4xx response is never an attack on its own. The rule still exists and still feeds the correlation.
+- **Rule 100220** (20 errors in 60 seconds from one IP) is what alerts, at level 10. Repetition is the signal of a scan, not a single error.
+- The **targeted rules** keep alerting on the first request: secrets and admin probes (100210), injection and traversal (100211), attack tools (100212).
+
+This is how mature detection is designed: atomic events are kept for context and correlation, and alerts are raised on behaviour.
+
 ## 7. Rootcheck events
 
 When the agent started, the rootkit scan (rootcheck) produced 15 alerts with rule 510. They will be triaged separately: on servers running Docker, these are often false positives caused by container files.
