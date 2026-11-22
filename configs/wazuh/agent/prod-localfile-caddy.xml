@@ -1,0 +1,17 @@
+<ossec_config>
+  <localfile>
+    <log_format>json</log_format>
+    <location>/var/log/caddy/api.zikrou.com.log</location>
+    <label key="log_source">caddy-api-prod</label>
+  </localfile>
+  <localfile>
+    <log_format>json</log_format>
+    <location>/var/log/caddy/app.zikrou.com.log</location>
+    <label key="log_source">caddy-app-prod</label>
+  </localfile>
+  <localfile>
+    <log_format>json</log_format>
+    <location>/var/log/caddy/admin.zikrou.com.log</location>
+    <label key="log_source">caddy-admin-prod</label>
+  </localfile>
+</ossec_config>

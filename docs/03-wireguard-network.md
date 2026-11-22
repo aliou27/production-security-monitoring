@@ -19,7 +19,7 @@ flowchart LR
     H["Wazuh server (hub)<br/>Azure, 10.10.0.1<br/>UDP 51820"]
     S -- "encrypted tunnel" --> H
     N -. "planned" .-> H
-    Z -. "planned" .-> H
+    Z -- "encrypted tunnel" --> H
 ```
 
 **Hub and spoke.** The Wazuh server is the hub. Each monitored server is a spoke that connects to the hub only.
@@ -27,7 +27,7 @@ flowchart LR
 | Host | Tunnel IP | Status |
 |---|---|---|
 | Wazuh server (hub) | 10.10.0.1 | Up |
-| Zikrou API | 10.10.0.2 | Planned |
+| Zikrou API (production) | 10.10.0.2 | **Connected** (see [report 06](06-production-onboarding.md)) |
 | Need Academy | 10.10.0.3 | Planned |
 | Zikrou staging | 10.10.0.4 | **Connected** |
 

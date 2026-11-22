@@ -53,14 +53,15 @@ Design principles:
 |---|---|---|---|
 | 1 | Cloud setup and server hardening | Done | [docs/01-cloud-setup-and-hardening.md](docs/01-cloud-setup-and-hardening.md) |
 | 2 | Wazuh installation | Done | [docs/02-wazuh-installation.md](docs/02-wazuh-installation.md) |
-| 3 | WireGuard network and agent enrollment | In progress: hub up, first agent (staging) active | [docs/03-wireguard-network.md](docs/03-wireguard-network.md) |
+| 3 | WireGuard network and agent enrollment | Done for staging and production; Need Academy planned | [docs/03-wireguard-network.md](docs/03-wireguard-network.md) |
 | 4 | Web logs and custom detections (Caddy) | Done on staging | [docs/04-web-logs-and-custom-detections.md](docs/04-web-logs-and-custom-detections.md) |
 | 5 | API security logs and auth detections, critical vulnerability found and fixed | Done on staging | [docs/05-api-security-logs-and-reset-code-vulnerability.md](docs/05-api-security-logs-and-reset-code-vulnerability.md) |
-| 4b | Windows lab with Sysmon | Planned | |
-| 6 | Baseline: one week of normal traffic | Planned | |
-| 7 | First detection: SSH brute force (T1110) | Planned | |
-| 8 | Attack and detect cycles, incident reports | Planned | |
-| 9 | Alert enrichment and triage automation | Planned | |
+| 6 | Production onboarding and first triage | Done | [docs/06-production-onboarding.md](docs/06-production-onboarding.md) |
+| 7 | Windows lab with Sysmon | Planned | |
+| 8 | Baseline: one week of normal traffic | Planned | |
+| 9 | SSH brute force detection and tuning (T1110) | Planned | |
+| 10 | Attack and detect cycles, incident reports | Planned | |
+| 11 | Alert enrichment and triage automation | Planned | |
 
 ## Repository layout
 
