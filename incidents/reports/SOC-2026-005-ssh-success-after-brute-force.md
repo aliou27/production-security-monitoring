@@ -51,6 +51,8 @@ Three questions, each answered with a separate check. Everything was read from t
 
 **Why `who` runs at login (most likely explanation).** Ubuntu's login banner shows system information, including the number of logged-in users, which it gets from `who`. On Ubuntu 26.04, `who` runs under an AppArmor profile that does not allow reading the user database, so the read is denied. The command fails silently, and the banner simply shows less information.
 
+**Confirmed on a second server (2026-11-23):** when logging in to the Need Academy server, also on Ubuntu 26.04, the banner said "Users logged in: 0" during an active session: `who` fails there the same way.
+
 An attacker's tool would not normally run as `who` within one second of an interactive login and touch only these two files. Combined with the verified key and IP, the explanation is consistent.
 
 ## 5. Impact assessment

@@ -18,7 +18,7 @@ flowchart LR
     Z["Zikrou API<br/>Hetzner, 10.10.0.2"]
     H["Wazuh server (hub)<br/>Azure, 10.10.0.1<br/>UDP 51820"]
     S -- "encrypted tunnel" --> H
-    N -. "planned" .-> H
+    N -- "encrypted tunnel" --> H
     Z -- "encrypted tunnel" --> H
 ```
 
@@ -28,7 +28,7 @@ flowchart LR
 |---|---|---|
 | Wazuh server (hub) | 10.10.0.1 | Up |
 | Zikrou API (production) | 10.10.0.2 | **Connected** (see [report 06](06-production-onboarding.md)) |
-| Need Academy | 10.10.0.3 | Planned |
+| Need Academy | 10.10.0.3 | **Connected** (see [report 08](08-need-academy-onboarding.md)) |
 | Zikrou staging | 10.10.0.4 | **Connected** |
 
 ## 3. Security properties

@@ -71,4 +71,4 @@ Two rules apply to every report: no personal data (accounts appear as fingerprin
 
 ## 7. Next step
 
-SSH detection engineering and automated response: rules for password spraying and for a successful login after failures, then IP blocking tested on staging only.
+Need Academy onboarding ([report 08](08-need-academy-onboarding.md)), then SSH detection engineering and automated response: rules for password spraying and for a successful login after failures, then IP blocking tested on staging only.

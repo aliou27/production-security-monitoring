@@ -1,0 +1,7 @@
+<ossec_config>
+  <localfile>
+    <log_format>json</log_format>
+    <location>/opt/need-academy/data/caddy/access.log</location>
+    <label key="log_source">caddy-need-academy</label>
+  </localfile>
+</ossec_config>

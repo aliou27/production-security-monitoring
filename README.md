@@ -53,16 +53,17 @@ Design principles:
 |---|---|---|---|
 | 1 | Cloud setup and server hardening | Done | [docs/01-cloud-setup-and-hardening.md](docs/01-cloud-setup-and-hardening.md) |
 | 2 | Wazuh installation | Done | [docs/02-wazuh-installation.md](docs/02-wazuh-installation.md) |
-| 3 | WireGuard network and agent enrollment | Done for staging and production; Need Academy planned | [docs/03-wireguard-network.md](docs/03-wireguard-network.md) |
+| 3 | WireGuard network and agent enrollment | Done for staging, Zikrou production and Need Academy | [docs/03-wireguard-network.md](docs/03-wireguard-network.md) |
 | 4 | Web logs and custom detections (Caddy) | Done on staging | [docs/04-web-logs-and-custom-detections.md](docs/04-web-logs-and-custom-detections.md) |
 | 5 | API security logs and auth detections, critical vulnerability found and fixed | Done on staging | [docs/05-api-security-logs-and-reset-code-vulnerability.md](docs/05-api-security-logs-and-reset-code-vulnerability.md) |
 | 6 | Production onboarding and first triage | Done | [docs/06-production-onboarding.md](docs/06-production-onboarding.md) |
 | 7 | Incident response process and first incident reports | Done | [docs/07-incident-response.md](docs/07-incident-response.md) |
-| 8 | SSH detection engineering and automated response | Planned | |
-| 9 | Windows lab with Sysmon and Atomic Red Team | Planned | |
-| 10 | Baseline: one week of normal traffic | Planned | |
-| 11 | Purple team scorecard | Planned | |
-| 12 | Alert enrichment and notifications | Planned | |
+| 8 | Need Academy onboarding | Done | [docs/08-need-academy-onboarding.md](docs/08-need-academy-onboarding.md) |
+| 9 | SSH detection engineering and automated response | Planned | |
+| 10 | Windows lab with Sysmon and Atomic Red Team | Planned | |
+| 11 | Baseline: one week of normal traffic | Planned | |
+| 12 | Purple team scorecard | Planned | |
+| 13 | Alert enrichment and notifications | Planned | |
 
 ## Repository layout
 
