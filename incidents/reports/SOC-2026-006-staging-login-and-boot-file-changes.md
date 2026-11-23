@@ -4,7 +4,7 @@
 |---|---|
 | Severity | Medium at detection, none after verification |
 | Classification | Login: benign positive (administrator). Boot files: false positive (content unchanged) |
-| Status | Closed, with one open confirmation and one tuning to apply |
+| Status | Closed |
 | Affected asset | `zikrou-staging`: SSH, `/boot/efi` |
 | Detection source | Rules 5715, 5501, 5502 (SSH session); rule 550 (file integrity monitoring) |
 | ATT&CK | T1078 Valid Accounts (ruled out), T1542 Pre-OS Boot (ruled out) |
@@ -25,6 +25,8 @@ Reviewing staging's alerts revealed two unrelated events. A successful SSH login
 | 2026-11-23 12:13 | Alerts of Nov 22 read from the daily archive |
 | 2026-11-23 12:36 | Reboot hypothesis disproved |
 | 2026-11-23 12:51 | Login key confirmed by the administrator |
+| 2026-11-23 13:07 | Memory pressure on staging measured |
+| 2026-11-23 13:08 | Inode-only alerts counted per day and per server: one occurrence |
 
 ## 3. Indicators
 
@@ -55,6 +57,15 @@ Staging has no automatic deployment, so a login there cannot be explained by CI/
 | Was it a reboot? | `uptime -s`, `last -x reboot` on staging | **No.** Last reboot on Nov 20 at 17:48. Hypothesis disproved. |
 | Leading explanation | Filesystem behaviour | `/boot/efi` is a FAT partition, which stores no inode numbers. Linux makes them up when it loads a file and can give a new one after dropping the file from its cache, which a small server under memory pressure does regularly. |
 
+### Confirming the explanation
+
+| Check | Result |
+|---|---|
+| Memory on staging (`free -m`) | 909 MB in total, 359 MB available, **552 MB of swap in use**: the kernel is under memory pressure and drops cached files regularly |
+| `/boot/efi` alerts per day and per server, Nov 19 to 23 | **One occurrence only**: 8 alerts on staging on Nov 22, all `inode` only. None on Zikrou production, Need Academy or the Wazuh server. |
+
+Both results fit the explanation: a one-off renumbering of FAT inodes on the one server short of memory. They do not prove it directly, but they leave no sign of tampering, and the content checks were clean.
+
 Why this mattered: a modified boot loader is how a bootkit survives reinstalls (T1542). A real change would show `size` and hash changes on `grubx64.efi` or `shimx64.efi`, not an inode alone.
 
 ## 5. Impact assessment
@@ -69,8 +80,9 @@ None required.
 
 | Recommendation | Owner | Status |
 |---|---|---|
-| Confirm the FAT explanation: memory pressure on staging and whether the same inode-only alerts recur on other days and servers | Analyst | Open |
-| Narrow tuning: stop checking the inode under `/boot/efi` only, keeping size, permissions and hashes. A change to the content still alerts. | Analyst | Open, after confirmation |
+| Confirm the FAT explanation: memory pressure on staging and whether the same inode-only alerts recur | Analyst | Done: memory pressure confirmed, one occurrence in five days |
+| Narrow tuning: stop checking the inode under `/boot/efi` only, keeping size, permissions and hashes | Analyst | Not applied: one occurrence is not a pattern. Apply if it recurs. |
+| Give staging more memory, or lighten its load: swapping also slows tests and can hide performance problems | Administrator | Suggested |
 | Use a distinct prompt or terminal colour per server, to avoid opening the wrong one | Administrator | Suggested |
 
 ## 8. Detection review
@@ -84,4 +96,5 @@ None required.
 1. A hypothesis that fits is not a verdict. The reboot explanation looked right and was wrong; checking it took one command.
 2. In a file integrity alert, *what* changed matters more than *that* something changed: here, the content was intact.
 3. Know where historical data lives before concluding "nothing found".
-4. Separate events that are close in time: the login and the file alerts were six hours apart and unrelated.
+4. Tune on evidence, not on one event: a single occurrence is recorded and watched; a rule changes when it repeats.
+5. Separate events that are close in time: the login and the file alerts were six hours apart and unrelated.

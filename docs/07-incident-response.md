@@ -70,7 +70,7 @@ Two rules apply to every report: no personal data (accounts appear as fingerprin
 | Send personal requests only when logged in; 401 instead of 403 | 003 | Production team |
 | Review rule 100400 after Wazuh signature updates | 004 | Analyst |
 | Build a rule for a successful login shortly after a brute force from another IP | 005 | Analyst |
-| Confirm the FAT inode explanation, then stop checking inodes under `/boot/efi` only | 006 | Analyst |
+| Stop checking inodes under `/boot/efi` if inode-only alerts recur | 006 | Analyst |
 
 ## 7. Next step
 
