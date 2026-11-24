@@ -22,15 +22,15 @@ The Wazuh central components (indexer, server, dashboard) need about 8 GB of RAM
 |---|---|---|
 | Region | Spain Central | Close to Senegal and to the Hetzner servers in Germany. Available for the student subscription. |
 | Image | Ubuntu Server 24.04 LTS x64 | Officially supported by Wazuh. |
-| Size | Standard_B2s_v2 (2 vCPU, 8 GiB) | Meets the 8 GiB RAM recommendation. B2ms was not available in the region. B-series VMs are burstable: they accumulate CPU credits while idle, which fits a lab with low, irregular load. 4 GiB sizes were rejected because the indexer would run out of memory. |
+| Size | Standard_B2s_v2 (2 vCPU, 8 GiB) | Meets the 8 GiB RAM recommendation. B2ms was not available in the region. B-series VMs are burstable: they accumulate CPU credits while idle, which fits a small deployment with low, irregular load. 4 GiB sizes were rejected because the indexer would run out of memory. |
 | Spot pricing | Off | Spot VMs can be evicted at any moment. Not acceptable for a SIEM. |
 | OS disk | 64 GiB Standard SSD (E6) | Enough for 30-day retention with a handful of agents. A managed disk can be enlarged but never shrunk. |
 | Authentication | SSH key only, Ed25519 | No password exists that could be brute-forced. Ed25519 is the modern default: short keys, fast, strong. |
-| Resource group | `rg-soc-lab` | Groups every lab resource so cost can be tracked and everything deleted at once. |
+| Resource group | `rg-soc-lab` | Groups every resource of the project so cost can be tracked and everything deleted at once. |
 
 ## 3. Cost controls
 
-The budget is $100 for 12 months, so the lab only pays for what runs.
+The budget is $100 for 12 months, so the project only pays for what runs.
 
 | Item | Billing | Estimated per month |
 |---|---|---|

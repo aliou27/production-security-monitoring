@@ -23,7 +23,7 @@ flowchart LR
     D -- "55000" --> M
 ```
 
-A single node is enough for a lab of a few agents. A larger SOC would split the indexer into a cluster for capacity and redundancy.
+A single node is enough for a few agents. A larger SOC would split the indexer into a cluster for capacity and redundancy.
 
 ## 2. Installation
 

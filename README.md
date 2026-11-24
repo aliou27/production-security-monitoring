@@ -1,8 +1,10 @@
-# SOC Homelab
+# Production Security Monitoring
 
-A cloud-based Security Operations Center built from scratch to practice and demonstrate SOC analyst skills: log collection, detection engineering, alert triage and incident response.
+A Security Operations Center that monitors two live production applications I build and run: **Zikrou** (mobile audio streaming, 6,000+ users) and **Need Academy** (English learning platform, 300 users). It covers log collection, detection engineering, alert triage and incident response on real traffic.
 
-The SIEM monitors two real production web applications that I build and run, plus lab machines that I attack on purpose to produce detections.
+A staging server and lab machines are attacked on purpose to validate each detection before it is trusted in production. Production itself is only observed.
+
+**Highlight:** detection testing on staging uncovered a critical account-takeover vulnerability in my own backend. It was exploited, fixed, retested and deployed to production the same day ([incident SOC-2026-001](incidents/reports/SOC-2026-001-reset-code-account-takeover.md)).
 
 ## Architecture
 

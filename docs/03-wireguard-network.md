@@ -133,7 +133,7 @@ The dashboard confirms the agent reports from its **tunnel IP, 10.10.0.4**: its 
 
 ### Measured overhead on a 1 GB server
 
-Staging is the smallest server in the lab (909 MiB of RAM). systemd reported **338 MB** for the agent, which looked alarming. Measuring the real resident memory of each process told a different story:
+Staging is the smallest monitored server (909 MiB of RAM). systemd reported **338 MB** for the agent, which looked alarming. Measuring the real resident memory of each process told a different story:
 
 ![Agent memory measurement](images/03/agent-staging-memory.png)
 

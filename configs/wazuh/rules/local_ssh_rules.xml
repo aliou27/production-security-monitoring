@@ -1,0 +1,54 @@
+<group name="syslog,sshd,local,">
+
+  <rule id="5710" level="0" overwrite="yes">
+    <if_sid>5700</if_sid>
+    <match>illegal user|invalid user</match>
+    <description>sshd: Attempt to login using a non-existent user</description>
+    <mitre>
+      <id>T1110.001</id>
+      <id>T1021.004</id>
+    </mitre>
+    <group>authentication_failed,gdpr_IV_35.7.d,gdpr_IV_32.2,gpg13_7.1,hipaa_164.312.b,invalid_login,nist_800_53_AU.14,nist_800_53_AC.7,nist_800_53_AU.6,pci_dss_10.2.4,pci_dss_10.2.5,pci_dss_10.6.1,tsc_CC6.1,tsc_CC6.8,tsc_CC7.2,tsc_CC7.3,</group>
+  </rule>
+
+  <rule id="100501" level="3">
+    <if_sid>5715</if_sid>
+    <match type="pcre2">SHA256:(TEBCj9el6kOdeTIfg5quE3bt7wuN0yTBkWwgXvvS4nM|AXmJhSoyq\+u0JX\+wv6fY7jTuwMWmA3m3O\+vLJDJhJ54|lZmafoqSmKfEY2tWsa1qbV8swpb/m70thb\+p/Os15PE|ztvYet25L6aDiU4g9GLiC4oq7DiRRDP7o2YNQELorag|Kl/VzUH8uxI7mMr8JPeJtulkNXudY6OO\+lLv\+87Wd44|ZqaGY1f7fcc2deeDGy2IdnMVaHmu6xMHJR/SrQp5/JU)</match>
+    <description>sshd: login with a known key for $(dstuser)</description>
+    <group>authentication_success,</group>
+  </rule>
+
+  <rule id="100502" level="12">
+    <if_sid>5715</if_sid>
+    <match>Accepted publickey</match>
+    <description>sshd: login for $(dstuser) with a key that is not in the allowlist</description>
+    <mitre>
+      <id>T1078</id>
+      <id>T1098.004</id>
+    </mitre>
+    <group>authentication_success,</group>
+  </rule>
+
+  <rule id="100503" level="12">
+    <if_sid>5715</if_sid>
+    <match>Accepted password|Accepted keyboard-interactive</match>
+    <description>sshd: password login for $(dstuser) although password authentication should be disabled</description>
+    <mitre>
+      <id>T1078</id>
+    </mitre>
+    <group>authentication_success,</group>
+  </rule>
+
+  <rule id="100510" level="10" timeframe="600">
+    <if_sid>100501</if_sid>
+    <if_matched_sid>5712</if_matched_sid>
+    <same_location />
+    <description>sshd: successful login on a host that was brute-forced in the last 10 minutes, verify the session</description>
+    <mitre>
+      <id>T1110</id>
+      <id>T1078</id>
+    </mitre>
+    <group>authentication_success,</group>
+  </rule>
+
+</group>
