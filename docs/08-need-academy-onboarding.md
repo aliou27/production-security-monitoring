@@ -75,12 +75,36 @@ Note on Docker and UFW: Docker publishes container ports through its own firewal
 | NA-2 | The login banner says "System restart required": a kernel update is not active yet | Low | Reboot at a quiet hour; the blue/green setup does not cover a host reboot, so expect a short outage |
 | NA-3 | The `deploy` user's sudo password is not known; administration happens as root | Low | Set a new password, store it in the password manager, then administer as `deploy` and set `PermitRootLogin no` |
 | NA-4 | `maxauthtries` at the default of 6 | Low | Set it to 3, as on the Wazuh server |
+| NA-5 | The GitHub Actions deploy used the administrator's **personal** SSH key, stored as a repository secret. That key also opens root on Zikrou production and on Need Academy. | High | **Fixed on 2026-11-24** (section 7) |
 
-## 7. Side observation: confirmation of SOC-2026-005
+## 7. NA-5: a personal key used by the CI/CD pipeline
+
+**How it was found.** Building the list of legitimate SSH keys for phase 09, the `authorized_keys` of the `deploy` user held only one key: the administrator's personal key. The server's logs confirmed it: in 30 days, about 270 logins as `deploy` from some 39 Microsoft Azure IPs (GitHub Actions runners, 7 connections per deployment), all with that personal key.
+
+**Why it mattered.** The private half of the personal key sat in the repository's secrets. That key also opens **root** on Zikrou production and on Need Academy. A leak of the GitHub secret (a malicious third-party action, a compromised account, a workflow that prints its environment) would have given full control of both production servers, not just the ability to deploy one application.
+
+**Fix, on 2026-11-24.**
+
+| Step | Result |
+|---|---|
+| Dedicated key `github-actions-need-academy-deploy` created | Fingerprint `SHA256:x3P0SOsc...` |
+| Public key added to `deploy` only | The key opens nothing else |
+| Repository secret `SSH_KEY` replaced with the new private key | The personal key no longer exists at GitHub |
+| Deployment re-run | Green; the server logged 7 logins as `deploy` from an Azure IP, **all with the new key** |
+| Local copy of the new private key deleted | It now exists only in GitHub's secrets |
+| Unused secret `RENDER_DEPLOY_HOOK` deleted | Left over from the former hosting |
+
+The administrator's personal key stays authorized on `deploy`, because it never was the problem: its copy at GitHub was. Zikrou already followed this pattern with its own dedicated deploy key.
+
+**Remaining:** a copy of the personal private key was stored at GitHub for two months. Replacing the personal key on both production servers is recommended, as a precaution.
+
+**Detection.** The new key was added to the allowlist of the SSH rules (phase 09), so its deployments are recognized, and any other key on `deploy` raises a level 12 alert.
+
+## 8. Side observation: confirmation of SOC-2026-005
 
 The login banner on this server said **"Users logged in: 0"** while I was logged in. That is the `who` command failing under its AppArmor profile on Ubuntu 26.04, which is exactly the explanation given in [SOC-2026-005](../incidents/reports/SOC-2026-005-ssh-success-after-brute-force.md) for the AppArmor denials after a login on Zikrou production. A second server, same symptom: the explanation holds.
 
-## 8. Next steps
+## 9. Next steps
 
 - Review the first web alerts from Need Academy after a few hours of real traffic, as was done for Zikrou ([report 06](06-production-onboarding.md), section 6).
 - Application security audit log for Need Academy: login failures, password resets, role changes, in the same format as Zikrou's, so the authentication rules can be reused.

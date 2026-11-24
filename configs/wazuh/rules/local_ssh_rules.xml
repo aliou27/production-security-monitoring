@@ -13,7 +13,7 @@
 
   <rule id="100501" level="3">
     <if_sid>5715</if_sid>
-    <match type="pcre2">SHA256:(TEBCj9el6kOdeTIfg5quE3bt7wuN0yTBkWwgXvvS4nM|AXmJhSoyq\+u0JX\+wv6fY7jTuwMWmA3m3O\+vLJDJhJ54|lZmafoqSmKfEY2tWsa1qbV8swpb/m70thb\+p/Os15PE|ztvYet25L6aDiU4g9GLiC4oq7DiRRDP7o2YNQELorag|Kl/VzUH8uxI7mMr8JPeJtulkNXudY6OO\+lLv\+87Wd44|ZqaGY1f7fcc2deeDGy2IdnMVaHmu6xMHJR/SrQp5/JU)</match>
+    <match type="pcre2">SHA256:(TEBCj9el6kOdeTIfg5quE3bt7wuN0yTBkWwgXvvS4nM|AXmJhSoyq\+u0JX\+wv6fY7jTuwMWmA3m3O\+vLJDJhJ54|lZmafoqSmKfEY2tWsa1qbV8swpb/m70thb\+p/Os15PE|ztvYet25L6aDiU4g9GLiC4oq7DiRRDP7o2YNQELorag|Kl/VzUH8uxI7mMr8JPeJtulkNXudY6OO\+lLv\+87Wd44|ZqaGY1f7fcc2deeDGy2IdnMVaHmu6xMHJR/SrQp5/JU|x3P0SOscDRdD3oiO7kkg2U\+oDvE/3ZhNLvs0YX\+KbZs)</match>
     <description>sshd: login with a known key for $(dstuser)</description>
     <group>authentication_success,</group>
   </rule>
